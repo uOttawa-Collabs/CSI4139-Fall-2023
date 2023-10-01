@@ -1,0 +1,13 @@
+# Rule to detect ICMP attacks
+alert icmp any any -> 172.17.0.2 any (msg:"ICMP packet too large"; dsize:>84; sid:1001; priority:100;)
+alert icmp any any -> 172.17.0.2 any (msg:"ICMP request too frequent"; detection_filter:track by_dst, count 10, seconds 3; sid:1002; priority:100;)
+
+# Rule to detect SNMP attacks
+alert udp any any -> 172.17.0.2 161 (msg:"SNMP query too frequent"; detection_filter:track by_dst, count 20, seconds 5; sid:2001; priority:100;)
+
+# Rules to detect spoofing
+alert ip !172.17.0.0/16 any -> 172.17.0.2 any (msg:"Source IP are out of valid CIDR block, possible spoofing"; sid:3002; priority:100;)
+
+# Rules for blacklisted source
+alert (msg:"REPUTATION_EVENT_BLACKLIST"; sid:1; gid:136; rev:1; metadata:rule-type preproc; classtype:bad-unknown;)
+
